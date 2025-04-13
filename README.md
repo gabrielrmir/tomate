@@ -13,6 +13,8 @@ To launch the program:
 tomate
 ```
 
+- `D` toggles between light and dark mode
+
 ## Dependencies
 
 - gcc

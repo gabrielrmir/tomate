@@ -65,6 +65,9 @@ void SetButtonStyleStop(Button *b) {
 }
 
 int main(void) {
+  bool dark_mode = false;
+  Color background = WHITE;
+  Color foreground = BLACK;
 
   const int screenWidth = 300;
   const int screenHeight = 200;
@@ -108,8 +111,14 @@ int main(void) {
 
     HandleButton(&btn);
 
+    if (IsKeyPressed(KEY_D)) {
+      dark_mode = !dark_mode;
+      background = dark_mode ? BLACK : RAYWHITE;
+      foreground = dark_mode ? RAYWHITE : BLACK;
+    }
+
     BeginDrawing();
-    ClearBackground(RAYWHITE);
+    ClearBackground(background);
 
     DrawButton(&btn);
 
@@ -132,7 +141,7 @@ int main(void) {
 
     snprintf(buffer, 255, "%02d:%02d", mins, secs);
     int time_width = MeasureText(buffer, 40);
-    DrawText(buffer, screenWidth / 2 - time_width / 2, y + 50, 40, BLACK);
+    DrawText(buffer, screenWidth / 2 - time_width / 2, y + 50, 40, foreground);
 
     EndDrawing();
   }

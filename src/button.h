@@ -16,6 +16,7 @@ typedef struct Button {
   Color color;
   Color hcolor;
   Color pcolor;
+  Color bcolor;
 } Button;
 
 bool IsButtonHovered(Button *button);

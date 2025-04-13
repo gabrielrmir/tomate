@@ -16,6 +16,7 @@ void InitButton(Button *button, Rectangle r, const char *text,
   button->color = LIGHTGRAY;
   button->hcolor = WHITE;
   button->pcolor = GRAY;
+  button->bcolor = BLACK;
   button->rect = r;
   button->text = text;
   button->action = action;
@@ -46,7 +47,7 @@ void DrawButton(Button *button) {
     DrawRectangleRec(button->rect, button->color);
   }
 
-  DrawRectangleLinesEx(button->rect, 2, BLACK);
+  DrawRectangleLinesEx(button->rect, 2, button->bcolor);
 
   int width = MeasureText(button->text, 20);
   DrawText(button->text,
