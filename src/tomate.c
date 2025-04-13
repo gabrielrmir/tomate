@@ -1,5 +1,6 @@
 #include "button.h"
 #include "raylib.h"
+#include "task.h"
 #include "timer.h"
 #include <pthread.h>
 #include <stdbool.h>
@@ -16,9 +17,8 @@ const char *BREAK_TEXT = "BREAK";
 pthread_t thread;
 Timer timer;
 
-int current_time;
-const char *current_title;
 int title_width;
+Task *current_task;
 
 void ActionStopTimer(Button *b);
 void SetButtonStyleStart(Button *b);
@@ -30,9 +30,12 @@ void ActionStartTimer(Button *b) {
   pthread_mutex_lock(&timer.mutex);
 
   if (timer.state == FINISHED || timer.state == IDLE) {
-    timer.time_left = timer.time_sec;
-    current_title = current_time % 2 == 0 ? WORK_TEXT : BREAK_TEXT;
-    title_width = MeasureText(current_title, 40);
+    if (timer.state == FINISHED)
+      current_task = current_task->next;
+
+    timer.time_left = current_task->time_sec;
+    title_width = MeasureText(current_task->title, 40);
+
     pthread_create(&thread, NULL, &RunTimer, (void *)(&timer));
   } else if (timer.state == PAUSED) {
     pthread_cond_signal(&timer.cond);
@@ -67,11 +70,13 @@ int main(void) {
   const int screenHeight = 200;
   const int y = 30;
 
-  const int times[] = {1500, 300, 1500, 300, 1500, 300, 1500, 1200};
-  const int times_size = ARRAY_SIZE(times);
+  int times[] = {1500, 300, 1500, 300, 1500, 300, 1500, 1200};
+  const char *titles[] = {
+      WORK_TEXT, BREAK_TEXT, WORK_TEXT, BREAK_TEXT,
+      WORK_TEXT, BREAK_TEXT, WORK_TEXT, BREAK_TEXT,
+  };
 
-  current_time = 0;
-  current_title = WORK_TEXT;
+  current_task = NewTasks(times, ARRAY_SIZE(times), titles, ARRAY_SIZE(titles));
 
   char buffer[255];
 
@@ -87,9 +92,9 @@ int main(void) {
   InitButton(&btn, r, START_TEXT, ActionStartTimer);
   SetButtonColors(&btn, GREEN, LIME, GREEN);
 
-  InitTimer(&timer, times[current_time]);
+  InitTimer(&timer, current_task->time_sec);
 
-  title_width = MeasureText(current_title, 40);
+  title_width = MeasureText(current_task->title, 40);
 
   while (!WindowShouldClose()) {
     int time_left = TimerTimeLeft(&timer);
@@ -99,8 +104,6 @@ int main(void) {
 
       PlaySound(finish_sound);
       SetButtonStyleStart(&btn);
-      current_time = (current_time + 1) % times_size;
-      timer.time_sec = times[current_time];
     }
 
     HandleButton(&btn);
@@ -113,8 +116,19 @@ int main(void) {
     int mins = (time_left / 60);
     int secs = time_left % 60;
 
-    DrawText(current_title, (screenWidth / 2) - (title_width / 2), y + 10, 40,
-             btn.hcolor);
+    DrawText(current_task->title, (screenWidth / 2) - (title_width / 2), y + 10,
+             40, btn.hcolor);
+
+    // Shows grayed out titles of previous and next tasks
+
+    // DrawText(current_task->next->title,
+    //         (screenWidth / 2) + (title_width / 2) + 10, y + 20, 20,
+    //         LIGHTGRAY);
+
+    // TODO: align text to the right
+    // DrawText(current_task->prev->title,
+    //          (screenWidth / 2) - (title_width / 2) - 80, y + 20, 20,
+    //          LIGHTGRAY);
 
     snprintf(buffer, 255, "%02d:%02d", mins, secs);
     int time_width = MeasureText(buffer, 40);
@@ -123,8 +137,11 @@ int main(void) {
     EndDrawing();
   }
 
+  FreeTasks(current_task);
+
   UnloadSound(finish_sound);
   CloseAudioDevice();
+
   CloseWindow();
 
   return 0;

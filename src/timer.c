@@ -21,18 +21,20 @@ int TimerTimeLeft(Timer *t) {
 
 void *RunTimer(void *arg) {
   Timer *t = (Timer *)arg;
+  int time_left = t->time_left;
 
   pthread_mutex_lock(&t->mutex);
   t->state = RUNNING;
+  time_left = t->time_left;
   pthread_mutex_unlock(&t->mutex);
 
-  while (t->time_left > 0) {
+  while (time_left > 0) {
     sleep(1);
     pthread_mutex_lock(&t->mutex);
     while (t->state == PAUSED) {
       pthread_cond_wait(&t->cond, &t->mutex);
     }
-    t->time_left--;
+    time_left = --t->time_left;
     pthread_mutex_unlock(&t->mutex);
   }
 

@@ -11,7 +11,12 @@ mkdir -p $BUILD
 INCLUDE=-I$HOME/deps/raylib/src/
 LIBDIR=-L$HOME/deps/raylib/src/
 
-SRCFILES="$SRC/tomate.c $SRC/button.c $SRC/timer.c"
+SRCFILES="
+$SRC/tomate.c
+$SRC/button.c
+$SRC/timer.c
+$SRC/task.c
+"
 
 gcc \
   $SRCFILES \
