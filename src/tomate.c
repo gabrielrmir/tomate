@@ -111,6 +111,14 @@ int main(void) {
 
     HandleButton(&btn);
 
+    if (IsKeyPressed(KEY_SPACE)) {
+      if (timer.state == RUNNING) {
+        ActionStopTimer(&btn);
+      } else {
+        ActionStartTimer(&btn);
+      }
+    }
+
     if (IsKeyPressed(KEY_D)) {
       dark_mode = !dark_mode;
       background = dark_mode ? BLACK : RAYWHITE;

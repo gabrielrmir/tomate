@@ -13,7 +13,10 @@ To launch the program:
 tomate
 ```
 
-- `D` toggles between light and dark mode
+### Key bindings
+
+- `<space>` pause/continue timer
+- `<d>` toggles between light and dark mode
 
 ## Dependencies
 
