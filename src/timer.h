@@ -4,7 +4,7 @@
 #include <pthread.h>
 #include <stdbool.h>
 
-typedef enum TimerState { WAITING, RUNNING, FINISHED } TimerState;
+typedef enum TimerState { IDLE, RUNNING, PAUSED, FINISHED } TimerState;
 
 typedef struct Timer {
   int time_sec;
@@ -12,8 +12,6 @@ typedef struct Timer {
   pthread_mutex_t mutex;
   pthread_cond_t cond;
   int time_left;
-
-  bool paused;
 
   TimerState state;
 } Timer;

@@ -8,7 +8,7 @@ void InitTimer(Timer *t, int secs) {
   pthread_mutex_init(&(t->mutex), NULL);
   t->time_sec = secs;
   t->time_left = secs;
-  t->state = WAITING;
+  t->state = IDLE;
 }
 
 int TimerTimeLeft(Timer *t) {
@@ -29,7 +29,7 @@ void *RunTimer(void *arg) {
   while (t->time_left > 0) {
     sleep(1);
     pthread_mutex_lock(&t->mutex);
-    while (t->paused) {
+    while (t->state == PAUSED) {
       pthread_cond_wait(&t->cond, &t->mutex);
     }
     t->time_left--;

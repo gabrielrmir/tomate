@@ -26,15 +26,27 @@ void SetButtonStyleStop(Button *b);
 
 void ActionStartTimer(Button *b) {
   SetButtonStyleStop(b);
-  current_title = current_time % 2 == 0 ? WORK_TEXT : BREAK_TEXT;
-  title_width = MeasureText(current_title, 40);
-  timer.time_left = timer.time_sec;
-  pthread_create(&thread, NULL, &RunTimer, (void *)(&timer));
+
+  pthread_mutex_lock(&timer.mutex);
+
+  if (timer.state == FINISHED || timer.state == IDLE) {
+    timer.time_left = timer.time_sec;
+    current_title = current_time % 2 == 0 ? WORK_TEXT : BREAK_TEXT;
+    title_width = MeasureText(current_title, 40);
+    pthread_create(&thread, NULL, &RunTimer, (void *)(&timer));
+  } else if (timer.state == PAUSED) {
+    pthread_cond_signal(&timer.cond);
+  }
+  timer.state = RUNNING;
+
+  pthread_mutex_unlock(&timer.mutex);
 }
 
 void ActionStopTimer(Button *b) {
   SetButtonStyleStart(b);
-  pthread_cancel(thread);
+  pthread_mutex_lock(&timer.mutex);
+  timer.state = PAUSED;
+  pthread_mutex_unlock(&timer.mutex);
 }
 
 void SetButtonStyleStart(Button *b) {
