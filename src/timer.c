@@ -29,6 +29,9 @@ void *RunTimer(void *arg) {
   while (t->time_left > 0) {
     sleep(1);
     pthread_mutex_lock(&t->mutex);
+    while (t->paused) {
+      pthread_cond_wait(&t->cond, &t->mutex);
+    }
     t->time_left--;
     pthread_mutex_unlock(&t->mutex);
   }
