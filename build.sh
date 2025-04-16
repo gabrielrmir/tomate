@@ -16,6 +16,7 @@ $SRC_DIR/tomate.c
 $SRC_DIR/button.c
 $SRC_DIR/timer.c
 $SRC_DIR/task.c
+$SRC_DIR/flags.c
 "
 
 mkdir -p $BUILD_DIR
