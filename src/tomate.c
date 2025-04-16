@@ -1,4 +1,5 @@
 #include "button.h"
+#include "flags.h"
 #include "raylib.h"
 #include "task.h"
 #include "timer.h"
@@ -7,12 +8,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#define ARRAY_SIZE(arr) sizeof(arr) / sizeof(*arr)
-
 const char *START_TEXT = "Start";
 const char *STOP_TEXT = "Stop";
-const char *WORK_TEXT = "WORK";
-const char *BREAK_TEXT = "BREAK";
 
 pthread_t thread;
 Timer timer;
@@ -64,24 +61,19 @@ void SetButtonStyleStop(Button *b) {
   SetButtonColors(b, RED, MAROON, RED);
 }
 
-int main(void) {
-  bool dark_mode = false;
-  Color background = WHITE;
-  Color foreground = BLACK;
+int main(int argc, char **argv) {
+  Context ctx = {0};
+  InitContext(argc, argv, &ctx);
+
+  Color background = ctx.dark ? BLACK : WHITE;
+  Color foreground = ctx.dark ? WHITE : BLACK;
 
   const int screenWidth = 300;
   const int screenHeight = 200;
   const int y = 30;
 
-  int times[] = {1500, 300, 1500, 300, 1500, 300, 1500, 1200};
-  const char *titles[] = {
-      WORK_TEXT, BREAK_TEXT, WORK_TEXT, BREAK_TEXT,
-      WORK_TEXT, BREAK_TEXT, WORK_TEXT, BREAK_TEXT,
-  };
-
-  current_task = NewTasks(times, ARRAY_SIZE(times), titles, ARRAY_SIZE(titles));
-
   char buffer[255];
+  current_task = ctx.task;
 
   InitWindow(screenWidth, screenHeight, "Tomate");
   InitAudioDevice();
@@ -125,9 +117,9 @@ int main(void) {
     }
 
     if (IsKeyPressed(KEY_D)) {
-      dark_mode = !dark_mode;
-      background = dark_mode ? BLACK : RAYWHITE;
-      foreground = dark_mode ? RAYWHITE : BLACK;
+      ctx.dark = !ctx.dark;
+      background = ctx.dark ? BLACK : RAYWHITE;
+      foreground = ctx.dark ? RAYWHITE : BLACK;
     }
 
     BeginDrawing();
