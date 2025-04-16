@@ -2,23 +2,22 @@
 
 set -e
 
-ROOT=$( dirname -- "${BASH_SOURCE[0]:-$0}" )
-SRC=$ROOT/src
-BUILD=$ROOT/build
+cd -- "$( dirname -- "${BASH_SOURCE[0]}" )"
 
-mkdir -p $BUILD
+TARGET=tomate
+SRC_DIR=./src
+BUILD_DIR=./build
 
-INCLUDE=-I$HOME/deps/raylib/src/
-LIBDIR=-L$HOME/deps/raylib/src/
+LDLIBS="-lraylib -lGL -lm -lpthread -ldl -lrt -lX11"
+CFLAGS="-Wall -std=c99"
 
-SRCFILES="
-$SRC/tomate.c
-$SRC/button.c
-$SRC/timer.c
-$SRC/task.c
+SRCS="
+$SRC_DIR/tomate.c
+$SRC_DIR/button.c
+$SRC_DIR/timer.c
+$SRC_DIR/task.c
 "
 
-gcc \
-  $SRCFILES \
-  -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 \
-  -o $BUILD/tomate
+mkdir -p $BUILD_DIR
+
+gcc $SRCS $LDLIBS -o $BUILD_DIR/$TARGET
