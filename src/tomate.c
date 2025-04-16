@@ -119,6 +119,11 @@ int main(void) {
       }
     }
 
+    if (IsKeyPressed(KEY_R) && IsKeyDown(KEY_LEFT_CONTROL) &&
+        timer.state == PAUSED) {
+      timer.time_left = current_task->time_sec;
+    }
+
     if (IsKeyPressed(KEY_D)) {
       dark_mode = !dark_mode;
       background = dark_mode ? BLACK : RAYWHITE;

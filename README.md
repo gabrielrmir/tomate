@@ -16,6 +16,7 @@ tomate
 ### Key bindings
 
 - `<space>` pause/continue timer
+- `<ctrl+r>` while paused resets current task
 - `<d>` toggles between light and dark mode
 
 ## Dependencies
